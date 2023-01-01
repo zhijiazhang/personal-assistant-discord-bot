@@ -2,6 +2,9 @@ import discord
 from discord.ext import commands
 import os
 from dotenv import load_dotenv
+import asyncio
+import datetime
+import re
 
 #loads env variable 
 load_dotenv()
@@ -24,10 +27,18 @@ async def on_ready():
     print(f"Logged in as {bot.user}")
 
 
-#test command
+#hello command
 @bot.command()
 async def hello(ctx):
     await ctx.send(f"Hello {ctx.author.mention}!")
+
+#info command
+@bot.command()
+async def info(ctx):
+    """prints the info of the command in which it was invoked"""
+
+    await ctx.send(f"You are {ctx.author}")
+    await ctx.send(f"This server is {ctx.guild}")
 
 
 
