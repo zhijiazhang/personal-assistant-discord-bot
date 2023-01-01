@@ -86,5 +86,72 @@ async def remind(ctx, *, message: str):
 
 
 
+#todo command
+#TODO write code to catch edge cases 
+
+# Create a dictionary to store the to-do lists for each user
+todo_lists = {}
+
+@bot.command()
+async def todo(ctx, *, message: str):
+
+    #if the user that called the command is not in the dictionary, add the user to the dictionary 
+    if ctx.author.id not in todo_lists:
+
+        todo_lists[ctx.author.id] = []
+
+    #split the message into list of words
+    words = message.strip().split()
+    
+    #check the first word in the command call to determine the action
+    action = words[0]
+    task = ' '.join(words[1:])
+    valid_actions = ['add', 'view', 'delete', 'done', 'clear']
+    
+    if action not in valid_actions:
+        await ctx.send("Invalid Command!")
+        await ctx.send("The valid commands are 'add', 'view, 'delete', 'done', 'clear'. ")
+        return 
+    
+    #add the task to the user's to-do list
+    if action == 'add':
+
+            #add task 
+            todo_lists[ctx.author.id].append(task)
+            await ctx.send('Item added to your to-do list')
+        
+    #show the user their to-do-list
+    elif action == 'view':
+
+        #prints if the list is empty
+        if len(todo_lists[ctx.author.id]) == 0:
+
+            await ctx.send("Your to-do list is empty")
+
+        else:
+
+            await ctx.send("Your to-do list: \n" + "\n".join(todo_lists[ctx.author.id]))
+
+
+    #user wants to delete a task or is done with a task
+    elif action == "delete" or action == "done":
+
+        if task not in todo_lists[ctx.author.id]:
+
+            await ctx.send("That task does not exist in your to-do list!")
+            await ctx.send("Make sure you have the task typed just like the way you added it.")
+            return
+        
+
+        todo_lists[ctx.author.id].remove(task)
+        await ctx.send("Task removed successfully")
+
+    
+    else:
+        todo_lists[ctx.author.id] = []
+        await ctx.send("Your to-do list has been cleared")
+
+
+
 #magic happens
 bot.run(bot_token)
