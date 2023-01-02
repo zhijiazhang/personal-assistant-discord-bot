@@ -21,20 +21,54 @@ intents.message_content = True
 #creates instance of a bot
 bot = commands.Bot(command_prefix="!", description="Personal Assistant Bot",intents=intents)
 
+#bot events 
 
+#executes when bot is logged on and online
 @bot.event
 async def on_ready():
-    """prints a message when bot is online"""
     print(f"Logged in as {bot.user}")
+
+
+
+#global error catching function
+#executes when user inputs a command incorrectly
+@bot.event
+async def on_command_error(ctx, error):
+
+    # Send a message to the user with a list of available commands
+    await ctx.send(f'Invalid command. Type !commands to see a list of available commands.')
+
 
 
 
 #bot commands
 
 
-#hello command
+
+@bot.command()
+async def commands(ctx):
+    """Type: !commands to view list of commands and instructions on how to use them"""
+    # Get a dictionary of all the registered commands, where the keys are the command names and the values are the command objects
+    commands = bot.all_commands
+
+    # Create a message with the list of commands and their docstrings
+    message = 'Here is a list of available commands:\n\n'
+    for name, command in commands.items():
+        if name != 'help':
+            message += f'{command} - {command.help}\n'
+
+    # Format the message as a code block
+    message = f'```{message}```'
+
+    # Send the message to the user
+    await ctx.send(message)
+
+
+
 @bot.command()
 async def hello(ctx):
+    """Type: !hello for a friendly message"""
+
     # Get the current time
     current_time = datetime.datetime.now()
     
@@ -51,21 +85,22 @@ async def hello(ctx):
 
 
 
-#info command
+
 @bot.command()
 async def info(ctx):
-    """prints the info of the command in which it was invoked"""
+    """Type: !info to access secret info"""
 
     await ctx.send(f"You are {ctx.author}")
     await ctx.send(f"Your Discord ID is {ctx.author.id}")
     await ctx.send(f"This server is {ctx.guild}")
+    await ctx.send(f"The server ID is {ctx.guild.id}")
     await ctx.send(f"This current channel is {ctx.channel.name}")
+    await ctx.send(f"The channel ID is {ctx.channel.id}")
 
 
 
 
 #remind command
-#TODO need to implement invalid input error catching
 
 """
 (\d+) matches one or more digits , which corresponds to time value
@@ -75,6 +110,7 @@ time_regex = re.compile(r'in (\d+) (hours?|minutes?|seconds?)')
 
 @bot.command()
 async def remind(ctx, *, message: str):
+    """Type: !remind [reminder] in [numerical number] [hours/minutes/seconds] to set reminder"""
     # Initialize the number of seconds to 0
     seconds = 0
     
@@ -83,7 +119,7 @@ async def remind(ctx, *, message: str):
         # Extract the time value and unit from the match
         value = int(match.group(1))
         unit = match.group(2)
-        
+            
         # Convert the time value to seconds and add it to the total
         if unit.startswith('hour'):
             seconds += value * 3600
@@ -91,12 +127,12 @@ async def remind(ctx, *, message: str):
             seconds += value * 60
         elif unit.startswith('second'):
             seconds += value
-    
+
     # Extract the reminder message from the input string
     reminder = time_regex.sub('', message).strip()
   
     # Send a message acknowledging the reminder has been set
-    await ctx.send(f'Okay, I will remind you about "{reminder}" in {value} {unit}')
+    await ctx.send(f'Okay, I will remind you to "{reminder}" in {value} {unit}')
     
     # Pause for the specified time
     await asyncio.sleep(seconds)
@@ -107,13 +143,14 @@ async def remind(ctx, *, message: str):
 
 
 #todo command
-#TODO write code to catch edge cases 
+#TODO add custom emojis to different tasks 
 
 # Create a dictionary to store the to-do lists for each user
 todo_lists = {}
 
 @bot.command()
 async def todo(ctx, *, message: str):
+    """Type: !todo [add/view/delete/done/clear] [task] to modify and view your to do list """
 
     #if the user that called the command is not in the dictionary, add the user to the dictionary 
     if ctx.author.id not in todo_lists:
@@ -129,16 +166,15 @@ async def todo(ctx, *, message: str):
     valid_actions = ['add', 'view', 'delete', 'done', 'clear']
     
     if action not in valid_actions:
-        await ctx.send("Invalid Command!")
-        await ctx.send("The valid commands are 'add', 'view, 'delete', 'done', 'clear'. ")
-        return 
+
+        raise on_command_error
     
     #add the task to the user's to-do list
     if action == 'add':
 
             #add task 
             todo_lists[ctx.author.id].append(task)
-            await ctx.send('Item added to your to-do list')
+            await ctx.send('Task has been added to your to-do list.')
         
     #show the user their to-do-list
     elif action == 'view':
@@ -150,7 +186,10 @@ async def todo(ctx, *, message: str):
 
         else:
 
-            await ctx.send("Your to-do list: \n" + "\n".join(todo_lists[ctx.author.id]))
+            list = "Your to-do list: \n\n" + "\n".join([f"\u2B50 {item}" for item in todo_lists[ctx.author.id]])
+            list = f'```{list}```'
+            
+            await ctx.send(list)
 
 
     #user wants to delete a task or is done with a task
@@ -159,55 +198,15 @@ async def todo(ctx, *, message: str):
         if task not in todo_lists[ctx.author.id]:
 
             await ctx.send("That task does not exist in your to-do list!")
-            await ctx.send("Make sure you have the task typed just like the way you added it.")
+            await ctx.send("Make sure you are typing the task exactly like the way you added it.")
             return
         
-
         todo_lists[ctx.author.id].remove(task)
-        await ctx.send("Task removed successfully")
+        await ctx.send("Task removed successfully!")
 
-    
     else:
         todo_lists[ctx.author.id] = []
         await ctx.send("Your to-do list has been cleared")
-
-
-
-#command command
-@bot.command()
-async def commands(ctx):
-    """gives user list of commands and instructions on how to use when called"""
-
-    await ctx.send(
-
-        "!info - calling this command will give information about the user who called the command and server into \n" +
-
-        "!hello - bot will respond with a random friendly greeting depending on time of day"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    )
-
-
-
-#ping command
 
 
 
