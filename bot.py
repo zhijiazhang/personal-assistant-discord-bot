@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import asyncio
 import datetime
 import re
+import random
 
 #loads env variable 
 load_dotenv()
@@ -27,10 +28,26 @@ async def on_ready():
     print(f"Logged in as {bot.user}")
 
 
+
+#bot commands
+
+
 #hello command
 @bot.command()
 async def hello(ctx):
-    await ctx.send(f"Hello {ctx.author.mention}!")
+    # Get the current time
+    current_time = datetime.datetime.now()
+    
+    # Determine the greeting based on the time of day
+    if current_time.hour < 12:
+        greeting = 'Good morning'
+    elif current_time.hour < 18:
+        greeting = 'Good afternoon'
+    else:
+        greeting = 'Good evening'
+    
+    # Send the greeting to the user
+    await ctx.send(f'{greeting}, {ctx.author.mention}!')
 
 
 
@@ -40,7 +57,10 @@ async def info(ctx):
     """prints the info of the command in which it was invoked"""
 
     await ctx.send(f"You are {ctx.author}")
+    await ctx.send(f"Your Discord ID is {ctx.author.id}")
     await ctx.send(f"This server is {ctx.guild}")
+    await ctx.send(f"This current channel is {ctx.channel.name}")
+
 
 
 
@@ -150,6 +170,45 @@ async def todo(ctx, *, message: str):
     else:
         todo_lists[ctx.author.id] = []
         await ctx.send("Your to-do list has been cleared")
+
+
+
+#command command
+@bot.command()
+async def commands(ctx):
+    """gives user list of commands and instructions on how to use when called"""
+
+    await ctx.send(
+
+        "!info - calling this command will give information about the user who called the command and server into \n" +
+
+        "!hello - bot will respond with a random friendly greeting depending on time of day"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    )
+
+
+
+#ping command
+
 
 
 
