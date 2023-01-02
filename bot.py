@@ -147,6 +147,7 @@ async def remind(ctx, *, message: str):
 
 # Create a dictionary to store the to-do lists for each user
 todo_lists = {}
+emoji_unicode = {'important':'\203c', 'fitness': '\1f3cb'}
 
 @bot.command()
 async def todo(ctx, *, message: str):
@@ -172,7 +173,12 @@ async def todo(ctx, *, message: str):
     #add the task to the user's to-do list
     if action == 'add':
 
-            #add task 
+            #add task with emoji based on context of task
+            exclamation = "\u2757"
+            if "important" in task:
+
+                task = f"{exclamation} {task}"
+
             todo_lists[ctx.author.id].append(task)
             await ctx.send('Task has been added to your to-do list.')
         
@@ -186,7 +192,7 @@ async def todo(ctx, *, message: str):
 
         else:
 
-            list = "Your to-do list: \n\n" + "\n".join([f"\u2B50 {item}" for item in todo_lists[ctx.author.id]])
+            list = "Your to-do list: \n\n" + "\n".join(todo_lists[ctx.author.id])
             list = f'```{list}```'
             
             await ctx.send(list)
@@ -209,7 +215,7 @@ async def todo(ctx, *, message: str):
         await ctx.send("Your to-do list has been cleared")
 
 
-
+#TODO add custom emojis for tasks in reminders
 
 #magic happens
 bot.run(bot_token)
