@@ -147,7 +147,6 @@ async def remind(ctx, *, message: str):
 
 # Create a dictionary to store the to-do lists for each user
 todo_lists = {}
-emoji_unicode = {'important':'\203c', 'fitness': '\1f3cb'}
 
 @bot.command()
 async def todo(ctx, *, message: str):
@@ -174,10 +173,29 @@ async def todo(ctx, *, message: str):
     if action == 'add':
 
             #add task with emoji based on context of task
-            exclamation = "\u2757"
-            if "important" in task:
+            
+            for x in task.split():
 
-                task = f"{exclamation} {task}"
+                if x.lower() in ('important', 'urgent', 'crucial'):
+
+                    task = "\u2757" + " " + task
+                    break
+
+                elif x.lower() in ('breakfast', 'lunch', 'dinner', 'eat',):
+
+                    task = "\U0001F60B" + " " + task
+                    break
+
+                elif x.lower() in ('study', 'work', 'project', 'leetcode', 'code'):
+
+                    task = '\U0001F4BB' + " " + task
+                    break
+                
+                elif x.lower() in ('gym', 'run', 'workout', 'practice'):
+
+                    task = "\U0001F3C3" + " " + task
+                    break
+
 
             todo_lists[ctx.author.id].append(task)
             await ctx.send('Task has been added to your to-do list.')
@@ -201,14 +219,18 @@ async def todo(ctx, *, message: str):
     #user wants to delete a task or is done with a task
     elif action == "delete" or action == "done":
 
-        if task not in todo_lists[ctx.author.id]:
+        for x in todo_lists[ctx.author.id]:
 
-            await ctx.send("That task does not exist in your to-do list!")
-            await ctx.send("Make sure you are typing the task exactly like the way you added it.")
-            return
+            if task in x:
+
+                todo_lists[ctx.author.id].remove(x)
+                await ctx.send("Task removed successfully!")
+                return
+
+        await ctx.send("That task does not exist in your to-do list!")
+        await ctx.send("Make sure you are typing the task exactly like the way you added it.")
         
-        todo_lists[ctx.author.id].remove(task)
-        await ctx.send("Task removed successfully!")
+        
 
     else:
         todo_lists[ctx.author.id] = []
@@ -216,6 +238,27 @@ async def todo(ctx, *, message: str):
 
 
 #TODO add custom emojis for tasks in reminders
+
+
+@bot.command()
+async def emoji(ctx):
+
+    test = "This is a reminder"
+    
+    #exclamation mark emoji
+    await ctx.send("\u2757" + test)
+
+    #fitness emoji
+    await ctx.send("\U0001F3C3" + test)
+
+    #food emoji
+    await ctx.send("\U0001F60B"+ test)
+
+    #study emoji
+    await ctx.send('\U0001F4BB' + test)
+
+
+
 
 #magic happens
 bot.run(bot_token)
