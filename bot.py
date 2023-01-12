@@ -6,6 +6,8 @@ import asyncio
 import datetime
 import re
 import random
+import requests
+import json
 
 #loads env variable 
 load_dotenv()
@@ -28,8 +30,6 @@ bot = commands.Bot(command_prefix="!", description="Personal Assistant Bot",inte
 async def on_ready():
     print(f"Logged in as {bot.user}")
 
-
-
 #global error catching function
 #executes when user inputs a command incorrectly
 @bot.event
@@ -37,9 +37,6 @@ async def on_command_error(ctx, error):
 
     # Send a message to the user with a list of available commands
     await ctx.send(f'Invalid command. Type !commands to see a list of available commands.')
-
-
-
 
 #bot commands
 
@@ -61,8 +58,6 @@ async def commands(ctx):
     # Send the message to the user
     await ctx.send(message)
 
-
-
 @bot.command()
 async def hello(ctx):
     """Type: !hello for a friendly message"""
@@ -82,8 +77,6 @@ async def hello(ctx):
     await ctx.send(f'{greeting}, {ctx.author.mention}!')
 
 
-
-
 @bot.command()
 async def info(ctx):
     """Type: !info to access secret info"""
@@ -94,9 +87,6 @@ async def info(ctx):
     await ctx.send(f"The server ID is {ctx.guild.id}")
     await ctx.send(f"This current channel is {ctx.channel.name}")
     await ctx.send(f"The channel ID is {ctx.channel.id}")
-
-
-
 
 #remind command
 """
@@ -138,7 +128,6 @@ async def remind(ctx, *, message: str):
     await ctx.send(f"{ctx.author.mention}, reminding you to {reminder}")
 
 
-
 #todo command
 # Create a dictionary to store the to-do lists for each user
 todo_lists = {}
@@ -167,8 +156,7 @@ async def todo(ctx, *, message: str):
     #add the task to the user's to-do list
     if action == 'add':
 
-            #add task with emoji based on context of task
-            
+            #add task with emoji based on context of task      
             for x in task.split():
 
                 if x.lower() in ('important', 'urgent', 'crucial'):
@@ -191,7 +179,6 @@ async def todo(ctx, *, message: str):
                     task = "\U0001F3C3" + " " + task
                     break
 
-
             todo_lists[ctx.author.id].append(task)
             await ctx.send('Task has been added to your to-do list.')
         
@@ -210,7 +197,6 @@ async def todo(ctx, *, message: str):
             
             await ctx.send(list)
 
-
     #user wants to delete a task or is done with a task
     elif action == "delete" or action == "done":
 
@@ -225,14 +211,29 @@ async def todo(ctx, *, message: str):
         await ctx.send("That task does not exist in your to-do list!")
         await ctx.send("Make sure you are typing the task exactly like the way you added it.")
         
-        
-
     else:
         todo_lists[ctx.author.id] = []
         await ctx.send("Your to-do list has been cleared")
 
 
+#get weather command
+weather_api_key = os.getenv("WEATHER_API_KEY")
 
+@bot.command()
+async def weather(ctx,*, location: str):
+    city, state = location.strip().split(",")
+    api_key = weather_api_key
+    base_url = "http://api.openweathermap.org/data/2.5/weather?"
+    complete_url = base_url + "appid=" + api_key + "&q=" + city + "," + state
+    response = requests.get(complete_url)
+    weather_data = json.loads(response.text)
+
+    await ctx.send(weather_data)
+
+    if "weather" in weather_data:
+        await ctx.send(f"The weather in {city},{state} is {weather_data['weather'][0]['main']} with a temperature of {weather_data['main']['temp']}°F")
+    else:
+        await ctx.send("City Not Found ")
 
 
 #magic happens
