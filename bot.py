@@ -43,8 +43,6 @@ async def on_command_error(ctx, error):
 
 #bot commands
 
-
-
 @bot.command()
 async def commands(ctx):
     """Type: !commands to view list of commands and instructions on how to use them"""
@@ -101,7 +99,6 @@ async def info(ctx):
 
 
 #remind command
-
 """
 (\d+) matches one or more digits , which corresponds to time value
 (hours?|minutes?|seconds?) matches to hours/hour , minutes/minute etc..
@@ -143,8 +140,6 @@ async def remind(ctx, *, message: str):
 
 
 #todo command
-#TODO add custom emojis to different tasks 
-
 # Create a dictionary to store the to-do lists for each user
 todo_lists = {}
 
@@ -236,26 +231,6 @@ async def todo(ctx, *, message: str):
         todo_lists[ctx.author.id] = []
         await ctx.send("Your to-do list has been cleared")
 
-
-#TODO add custom emojis for tasks in reminders
-
-
-@bot.command()
-async def emoji(ctx):
-
-    test = "This is a reminder"
-    
-    #exclamation mark emoji
-    await ctx.send("\u2757" + test)
-
-    #fitness emoji
-    await ctx.send("\U0001F3C3" + test)
-
-    #food emoji
-    await ctx.send("\U0001F60B"+ test)
-
-    #study emoji
-    await ctx.send('\U0001F4BB' + test)
 
 
 
