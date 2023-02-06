@@ -8,7 +8,7 @@ A discord bot with the current capabilities:
 
 `daily remind` prompts the bot to remind the user daily about a certain task, for example everyday at 8:45 am : "You have lectures in 15 mins".
 
-`todo list` prompts the bot to keep track of user's to-do list, where user can `add` tasks, `view` to-do list, `delete` tasks, and mark tasks as `complete`. 
+`todo list` prompts the bot to keep track of user's to-do list, where the user can `add` tasks, `view` to-do list, `delete` tasks, and mark tasks as `complete`. 
 
 `weather` prompts the bot to fetch the user the current weather for the a given city.
 
@@ -20,6 +20,7 @@ The bot is hosted on repl.it, kept "alive" by a uptime monitoring service, and c
 
 
 ## Command Demos
+
 [![IMG-1748.jpg](https://i.postimg.cc/RFWKcNsh/IMG-1748.jpg)](https://postimg.cc/LYMJS6MF)
 
 ### 2 mins later..
